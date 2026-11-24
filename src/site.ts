@@ -27,8 +27,9 @@ export const site = {
   channelLabel: channel === 'stable' ? 'Free' : `Free ${channel}`,
   date: pretty(v.date) ?? c.date ?? '',
   installerUrl: installer,
-  downloadHref: installer || c.downloadUrl || '/download',
-  downloadName: installer ? `Fragmio-${version}-setup.exe` : 'the installer',
+  // Every download button: /get starts the newest installer (newest stable once there is one), from GitHub.
+  downloadHref: '/get',
+  downloadName: 'the newest installer (.exe)',
   latestUrl: c.downloadUrl || 'https://github.com/all-bluez/fragmio-releases/releases/latest',
   releasesUrl: c.releasesUrl || 'https://github.com/all-bluez/fragmio-releases/releases',
   hubUrl: hub || 'https://allbluez-hub.vercel.app',

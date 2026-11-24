@@ -6,13 +6,39 @@
 // Works with only one of the two set up: then the message is only saved, or only emailed.
 const db = require("./_lib/db");
 const mail = require("./_lib/mail");
+const tpl = require("./_lib/email");
 
 const KINDS = { idea: "Idea", problem: "Problem", like: "Something I like" };
 const EMAIL = /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]{2,}$/;
 const PER_HOUR = 5; // messages one email can send in an hour
 const recent = new Map(); // email → send times, when Supabase isn't set up (best effort)
 
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const esc = tpl.esc;
+const KIND_COLOR = { idea: "#7048e8", problem: "#e03131", like: "#2b8a3e" };
+
+/** The email you get: what kind, who, their message, and their version. */
+function feedbackHtml({ kind, name, email, message, version, channel, os, saved }) {
+  const c = tpl.colors;
+  const row = (label, value) =>
+    value ? `<tr><td class="muted" style="padding:3px 14px 3px 0;color:${c.MUTED};font-size:13px;white-space:nowrap">${label}</td><td class="ink" style="padding:3px 0;color:${c.INK};font-size:13.5px">${value}</td></tr>` : "";
+  return tpl.layout({
+    title: `${KINDS[kind]} from ${name}`,
+    preheader: message.replace(/\s+/g, " ").slice(0, 110),
+    body: `<div style="margin:0 0 14px">${tpl.pill(KINDS[kind], KIND_COLOR[kind])}</div>
+<h1 class="ink h1" style="margin:0 0 4px;font-size:22px;line-height:1.3;font-weight:800;color:${c.INK}">${esc(name)}</h1>
+<p style="margin:0 0 20px"><a href="mailto:${esc(email)}" style="color:${c.BERRY};text-decoration:none;font-weight:600">${esc(email)}</a></p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 20px"><tr>
+<td class="box ink" style="background:${c.SOFT};border-left:4px solid ${KIND_COLOR[kind]};border-radius:0 12px 12px 0;padding:16px 18px;color:${c.INK};font-size:15.5px;line-height:1.6;white-space:pre-wrap">${esc(message)}</td>
+</tr></table>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 22px">
+${row("App", version ? esc(`Fragmio ${version}${channel ? " " + channel : ""}`) : "")}
+${row("Windows", esc(os))}
+${row("Sent", esc(new Date().toLocaleString("en-GB", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })) + " IST")}
+</table>
+<div style="text-align:center">${tpl.button(`Reply to ${name.split(" ")[0]}`, `mailto:${email}?subject=${encodeURIComponent("Re: your Fragmio " + KINDS[kind].toLowerCase())}`)}</div>`,
+    footer: `Or just press Reply: it goes to ${esc(email)}.${saved ? "<br>Also saved in Supabase → Table Editor → feedback." : ""}`,
+  });
+}
 const short = (v, n) => String(v || "").replace(/[\r\n\t]+/g, " ").trim().slice(0, n);
 
 async function tooMany(email) {
@@ -81,11 +107,7 @@ module.exports = async function handler(req, res) {
         fromName: "Fragmio feedback",
         subject: `[Fragmio ${KINDS[kind]}] ${first}${message.length > 60 ? "…" : ""}`,
         text: [`${KINDS[kind]} from ${name} <${email}>`, about, "", message, "", "Reply to this email to answer them."].filter((l) => l !== undefined).join("\n"),
-        html: `<div style="font-family:Segoe UI,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1c2126;max-width:600px">
-<p style="margin:0 0 4px"><b>${esc(KINDS[kind])}</b> from ${esc(name)} &lt;<a href="mailto:${esc(email)}">${esc(email)}</a>&gt;</p>
-${about ? `<p style="margin:0 0 14px;color:#6b7280;font-size:13px">${esc(about)}</p>` : ""}
-<div style="white-space:pre-wrap;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:14px">${esc(message)}</div>
-<p style="color:#6b7280;font-size:13px;margin:14px 0 0">Reply to this email to answer them.${saved ? " It is also saved in Supabase (table feedback)." : ""}</p></div>`,
+        html: feedbackHtml({ kind, name, email, message, version, channel, os, saved }),
       });
       mailed = true;
     } catch (err) {

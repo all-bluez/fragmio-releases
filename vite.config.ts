@@ -9,6 +9,12 @@ import { defineConfig, type Plugin } from 'vite'
 const versionFile = (): Plugin => ({
   name: 'version-json',
   configureServer(server) {
+    // /get runs on Vercel only (api/get.js); in npm run dev the download buttons open the releases page instead.
+    server.middlewares.use('/get', (_req, res) => {
+      res.statusCode = 302
+      res.setHeader('Location', 'https://github.com/all-bluez/fragmio-releases/releases')
+      res.end()
+    })
     // Only the plain file: the site's own code also asks for it (as /version.json?import), and that goes to Vite.
     server.middlewares.use('/version.json', (req, res, next) => {
       if (req.url && req.url !== '/') return next()

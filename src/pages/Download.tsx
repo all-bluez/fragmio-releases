@@ -9,9 +9,9 @@ export function Download(): JSX.Element {
   const { search } = usePlace()
   const [starting, setStarting] = useState(false)
   useEffect(() => {
-    if (!/[?&]get=1\b/.test(search) || !site.installerUrl) return
+    if (!/[?&]get=1\b/.test(search)) return
     setStarting(true)
-    const id = setTimeout(() => (location.href = site.installerUrl), 600)
+    const id = setTimeout(() => (location.href = site.downloadHref), 600)
     return () => clearTimeout(id)
   }, [search])
   return (
@@ -61,7 +61,7 @@ export function Download(): JSX.Element {
               Download the installer
             </a>{' '}
             <p className="muted" style={{ fontSize: '13.5px', marginTop: '12px' }}>
-              Downloads <code>{site.downloadName}</code>. Didn't start?{' '}
+              Downloads {site.downloadName}. Didn't start?{' '}
               <a href={site.latestUrl} target="_blank" rel="noopener" style={{ color: 'var(--a)' }}>
                 Download it from GitHub
               </a>{' '}

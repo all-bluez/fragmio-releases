@@ -3,7 +3,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "trailingSlash": false,
-  "rewrites": [{ "source": "/((?!api/|assets/|version\\.json$|[^/]+\\.[a-z0-9]+$).*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/get", "destination": "/api/get" }, { "source": "/((?!api/|assets/|version\\.json$|[^/]+\\.[a-z0-9]+$).*)", "destination": "/index.html" }],
   "redirects": [
     { "source": "/download.html", "destination": "/download", "permanent": true },
     { "source": "/feedback.html", "destination": "/feedback", "permanent": true },

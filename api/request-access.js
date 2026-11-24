@@ -11,6 +11,7 @@
 const db = require("./_lib/db");
 const mail = require("./_lib/mail");
 const invite = require("./_lib/invite");
+const tpl = require("./_lib/email");
 
 // The plan new people get: the release channel while testing (alpha / beta), free once a stable version is out.
 // version.json is written by the release automation, so this follows the newest release by itself.
@@ -29,44 +30,54 @@ const EMAIL = /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]{2,}$/;
 const RESEND_GAP = 10 * 60 * 1000; // don't email the same person more than once in 10 minutes
 const recent = new Map(); // fallback mode only: email → last request (best effort)
 
-const site = () => (process.env.SITE_URL || "https://fragmio.vercel.app").replace(/\/+$/, "");
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const site = tpl.site;
 
 function codeEmail(code, expires) {
-  const get = `${site()}/download?get=1`; // the download page starts the newest installer
+  const download = `${site()}/download?get=1`; // the download page, which starts the newest installer
   const github = "https://github.com/all-bluez/fragmio-releases/releases/latest"; // the last resort
-  const until = expires ? `Your code works until ${expires}.` : "";
+  const until = expires ? `Your code works until ${new Date(expires + "T12:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}.` : "";
   const text = [
     "Welcome to the Fragmio beta!",
     "",
     "Your invite code:",
     code,
     "",
-    "1. Download Fragmio: " + get,
-    "   (Not working? Download the latest version here: " + github + ")",
+    "1. Download Fragmio: " + download,
     "2. Install it and open it.",
     "3. Paste the code when Fragmio asks for it. You only do this once.",
     "",
+    "Download not starting? Get it from GitHub: " + github,
     until,
-    "Found a bug or have an idea? Reply to this email or use Help → Send feedback in the app.",
+    "",
+    "Found a bug or have an idea? Just reply to this email.",
     "",
     "Thanks for testing,",
     "ZAK, allbluez.",
   ].join("\n");
-  const html = `<div style="font-family:Segoe UI,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1c2126;max-width:560px">
-<p style="font-size:18px;font-weight:700;margin:0 0 12px">Welcome to the Fragmio beta!</p>
-<p style="margin:0 0 6px">Your invite code:</p>
-<p style="font-family:Consolas,monospace;font-size:13px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:12px;word-break:break-all;margin:0 0 18px">${esc(code)}</p>
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 10px"><tr><td style="border-radius:10px;background:#c2185b">
-<a href="${esc(get)}" style="display:inline-block;padding:12px 22px;font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px">Download Fragmio</a>
+  const { colors: c } = tpl;
+  const step = (n, html) => `<tr><td valign="top" style="padding:0 12px 12px 0"><span style="display:inline-block;width:26px;height:26px;line-height:26px;border-radius:99px;background:${c.SOFT};color:${c.BERRY};font-weight:800;font-size:13px;text-align:center">${n}</span></td><td class="ink" style="padding:2px 0 12px;color:${c.INK}">${html}</td></tr>`;
+  const html = tpl.layout({
+    title: "Your Fragmio beta invite code",
+    preheader: "Your invite code is inside. Download Fragmio, paste the code, and start clipping.",
+    body: `${tpl.h1("Welcome to the Fragmio beta!")}
+${tpl.p("Thanks for joining. Here is your invite code: Fragmio asks for it once, the first time it opens.")}
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:6px 0 24px"><tr>
+<td class="box" style="background:${c.SOFT};border:1px dashed ${c.BERRY};border-radius:12px;padding:16px 18px">
+<div class="muted" style="font-size:11.5px;font-weight:700;letter-spacing:.6px;color:${c.BERRY};margin-bottom:6px">YOUR INVITE CODE</div>
+<div class="ink" style="font-family:Consolas,Menlo,monospace;font-size:13px;line-height:1.5;color:${c.INK};word-break:break-all">${tpl.esc(code)}</div>
 </td></tr></table>
-<p style="font-size:13px;color:#6b7280;margin:0 0 18px">Button not working? <a href="${esc(github)}" style="color:#c2185b">Download the latest version here</a>.</p>
-<ol style="padding-left:20px;margin:0 0 16px">
-<li>Install it and open it.</li>
-<li>Paste the code when Fragmio asks for it. You only do this once.</li>
-</ol>
-<p style="color:#6b7280;margin:0 0 16px">${esc(until)} Found a bug or have an idea? Reply to this email or use Help → Send feedback in the app.</p>
-<p style="margin:0">Thanks for testing,<br>ZAK, allbluez.</p></div>`;
+<div style="margin:0 0 26px;text-align:center">${tpl.button("Download Fragmio", download)}
+<div class="muted" style="margin-top:10px;font-size:12.5px;color:${c.MUTED}">Free for Windows 10 and 11 · 64-bit</div></div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 8px">
+${step(1, "<b>Download</b> and run the installer. If Windows says &ldquo;Windows protected your PC&rdquo;, click <b>More info → Run anyway</b>.")}
+${step(2, "<b>Open Fragmio.</b>")}
+${step(3, "<b>Paste your code</b> when it asks. You only do this once.")}
+</table>
+<hr style="border:0;border-top:1px solid ${c.LINE};margin:8px 0 18px">
+${tpl.p(`Download not starting? <a href="${tpl.esc(github)}" style="color:${c.BERRY}">Get it from GitHub</a>.${until ? " " + tpl.esc(until) : ""}`, "font-size:13.5px")}
+${tpl.p("Found a bug or have an idea? Just reply to this email: it comes straight to me.", "font-size:13.5px")}
+<p class="ink" style="margin:18px 0 0;color:${c.INK}">Thanks for testing,<br><b>ZAK</b>, allbluez.</p>`,
+  });
   return { subject: "Your Fragmio beta invite code", text, html };
 }
 
