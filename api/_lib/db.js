@@ -2,7 +2,8 @@
 //   SUPABASE_URL          e.g. https://abcd.supabase.co
 //   SUPABASE_SERVICE_KEY  Project Settings → API Keys → Secret keys (sb_secret_…), or the old service_role key
 function cfg() {
-  const url = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
+  // Accepts the address with or without /rest/v1 at the end (Supabase's Data API page shows it with).
+  const url = (process.env.SUPABASE_URL || "").trim().replace(/\/+$/, "").replace(/\/rest\/v1$/i, "").replace(/\/+$/, "");
   const key = process.env.SUPABASE_SERVICE_KEY || "";
   return url && key ? { url, key } : null;
 }
