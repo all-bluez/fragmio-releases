@@ -60,13 +60,13 @@ export function Home(): JSX.Element {
             <p>Fragmio is in private beta. Leave your email and we'll send you an invite code.</p>
             <AccessForm buttonClass="btn" />
             <p className="havecode">
-              Already have a code? <a href={site.downloadHref}>Download for Windows</a>
+              Already have a code? <a href="/download">Download for Windows</a>
             </p>
           </div>
         )}{' '}
         <div className="cta">
           {site.stable && (
-            <a href={site.downloadHref} className="btn">
+            <a href="/download" className="btn">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z" />
               </svg>
@@ -978,7 +978,7 @@ export function Home(): JSX.Element {
             Fragmio <span>{site.version}</span> is free{!site.stable && <span> during the beta</span>}.
           </p>
           {site.stable && (
-            <a href={site.downloadHref} className="btn">
+            <a href="/download" className="btn">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z" />
               </svg>
@@ -990,7 +990,7 @@ export function Home(): JSX.Element {
               <p>Fragmio is invite-only during the beta. Leave your email for a code.</p>
               <AccessForm buttonClass="btn light" />
               <p className="havecode">
-                Already have a code? <a href={site.downloadHref}>Download for Windows</a>
+                Already have a code? <a href="/download">Download for Windows</a>
               </p>
             </div>
           )}
