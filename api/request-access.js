@@ -115,18 +115,24 @@ module.exports = async function handler(req, res) {
   const makes = MAKES.includes(body.makes) ? body.makes : "";
   if (!EMAIL.test(email)) return res.status(400).json({ ok: false, error: "Please enter a valid email address." });
 
+  let step = "starting";
   try {
-    if (!db.ready() || !invite.ready() || !mail.ready()) return await fallback(email, makes, res);
+    if (!db.ready() || !invite.ready() || !mail.ready()) {
+      step = "emailing you the request (no database or invite key yet)";
+      return await fallback(email, makes, res);
+    }
 
     const days = Number(process.env.BETA_DAYS || 180);
     const today = new Date().toISOString().slice(0, 10);
     const now = new Date();
+    step = "reading the users table (has supabase-setup.sql been run?)";
     let [row] = await db.select("users", `app=eq.fragmio&email=${db.eq(email)}&select=*`);
     let isNew = false;
 
     if (!row) {
       const name = email.split("@")[0];
       const { code, expires } = invite.makeCode(email, name, days);
+      step = "saving the new user";
       row = await db.insert("users", { app: "fragmio", email, plan: newPlan(), makes, code, expires });
       isNew = true;
     } else {
@@ -138,6 +144,7 @@ module.exports = async function handler(req, res) {
       if (Object.keys(patch).length) row = await db.update("users", `id=eq.${row.id}`, patch);
     }
 
+    step = "sending the email (check GMAIL_USER and GMAIL_APP_PASSWORD)";
     const m = codeEmail(row.code, row.expires);
     await mail.send({ to: email, subject: m.subject, text: m.text, html: m.html, fromName: "Fragmio", replyTo: mail.ownerInbox() || undefined });
     await db.update("users", `id=eq.${row.id}`, { last_sent_at: now.toISOString(), sent_count: (row.sent_count || 0) + 1 });
@@ -149,7 +156,7 @@ module.exports = async function handler(req, res) {
     }
     return res.status(200).json({ ok: true, sent: true });
   } catch (err) {
-    console.error("request-access failed:", err && err.message);
+    console.error(`request-access failed while ${step}:`, err && err.message);
     return res.status(500).json({ ok: false, error: "Couldn't send right now. Please try again in a minute." });
   }
 };

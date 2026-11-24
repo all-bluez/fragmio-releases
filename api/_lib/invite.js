@@ -7,8 +7,13 @@ const b64url = (buf) => buf.toString("base64").replace(/\+/g, "-").replace(/\//g
 function key() {
   let pem = (process.env.INVITE_PRIVATE_KEY || "").trim();
   if (!pem) return null;
-  pem = pem.replace(/\\n/g, "\n"); // pasted as one line with \n
-  if (!pem.includes("BEGIN")) pem = `-----BEGIN PRIVATE KEY-----\n${pem.replace(/\s+/g, "")}\n-----END PRIVATE KEY-----\n`;
+  // However it was pasted (with its lines, as one line, with \n, or only the middle part): keep just the key itself.
+  const body = pem
+    .replace(/\\n/g, "\n")
+    .replace(/-----(BEGIN|END) [A-Z ]*PRIVATE KEY-----/g, "")
+    .replace(/[^A-Za-z0-9+/=]/g, "");
+  if (!body) return null;
+  pem = `-----BEGIN PRIVATE KEY-----\n${body.match(/.{1,64}/g).join("\n")}\n-----END PRIVATE KEY-----\n`;
   try {
     return createPrivateKey(pem);
   } catch {
