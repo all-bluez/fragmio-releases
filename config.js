@@ -1,6 +1,6 @@
 // Everything you may want to change, in one place.
 window.FRAGMIO = {
-  version: '1.19.1',
+  version: '1.19.2',
   channel: 'beta', // alpha / beta / stable (set automatically when a release is published)
   date: '24 Nov 2026',
   // The newest installer. "releases/latest" always shows the newest release on GitHub.
