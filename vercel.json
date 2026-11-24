@@ -1,4 +1,18 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "trailingSlash": false,
+  "rewrites": [{ "source": "/((?!api/|assets/|version\\.json$|[^/]+\\.[a-z0-9]+$).*)", "destination": "/index.html" }],
+  "redirects": [
+    { "source": "/download.html", "destination": "/download", "permanent": true },
+    { "source": "/feedback.html", "destination": "/feedback", "permanent": true },
+    { "source": "/support.html", "destination": "/support", "permanent": true }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+    ] }
+  ]
 }
