@@ -2181,3 +2181,6 @@ code {
 .fb-done h3{font-size:20px;margin-bottom:6px}
 .fb-done .btn{margin-top:14px}
 @media (max-width:640px){.fb-send .btn{width:100%}}
+.fb-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fb-note{display:block;margin-top:-10px;color:var(--muted);font-size:13px}
+@media (max-width:640px){.fb-two{grid-template-columns:1fr}}

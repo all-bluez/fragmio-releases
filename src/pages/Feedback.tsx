@@ -25,15 +25,17 @@ export function Feedback(): JSX.Element {
     e.preventDefault()
     const f = e.currentTarget.elements as unknown as Record<string, HTMLInputElement>
     const message = f.message.value.trim()
+    const name = f.name.value.trim()
     const email = f.email.value.trim()
     if (message.length < 5) return setState({ kind: 'bad', text: 'Please write a little more.' })
+    if (name.length < 2) return setState({ kind: 'bad', text: 'Please enter your name.' })
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return setState({ kind: 'bad', text: 'Please enter a valid email address.' })
     setState({ kind: 'sending', text: 'Sending…' })
     try {
       const r = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind, message, email, version, channel, os, website: f.website.value })
+        body: JSON.stringify({ kind, message, name, email, version, channel, os, website: f.website.value })
       })
       const res = (await r.json().catch(() => ({ ok: false }))) as { ok?: boolean; error?: string }
       if (res.ok) setState({ kind: 'done' })
@@ -87,11 +89,17 @@ export function Feedback(): JSX.Element {
                 }
               />
             </label>
-            <label className="fb-field">
-              <span>Your email</span>
-              <input type="email" name="email" autoComplete="email" required placeholder="you@example.com" />
-              <small>So we can reply. We never share it or send you anything else.</small>
-            </label>
+            <div className="fb-two">
+              <label className="fb-field">
+                <span>Your name</span>
+                <input type="text" name="name" autoComplete="name" required maxLength={80} placeholder="Your name" />
+              </label>
+              <label className="fb-field">
+                <span>Your email</span>
+                <input type="email" name="email" autoComplete="email" required placeholder="you@example.com" />
+              </label>
+            </div>
+            <small className="fb-note">So we can reply. We never share your details or send you anything else.</small>
             {version && (
               <p className="fb-about">
                 Sent with your version: <b>Fragmio {version}{channel ? ` ${channel}` : ''}</b>

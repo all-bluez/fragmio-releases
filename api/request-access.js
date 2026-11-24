@@ -2,7 +2,7 @@
 // The same email asking again gets the same code again (a new one only if the old one has expired).
 //
 // Vercel → Project → Settings → Environment Variables:
-//   SUPABASE_URL, SUPABASE_SERVICE_KEY   where beta users are saved (the hub shows them)
+//   SUPABASE_URL, SUPABASE_SERVICE_KEY   where users are saved, with their plan (the hub shows them)
 //   INVITE_PRIVATE_KEY                   the text of ~/.fragmio-keys/invite-ed25519-private.pem
 //   GMAIL_USER, GMAIL_APP_PASSWORD       email for now (or RESEND_API_KEY + MAIL_FROM later)
 //   optional: BETA_DAYS (how long codes work, default 180), NOTIFY_NEW_BETA=1 (email you about each new user),
@@ -11,6 +11,18 @@
 const db = require("./_lib/db");
 const mail = require("./_lib/mail");
 const invite = require("./_lib/invite");
+
+// The plan new people get: the release channel while testing (alpha / beta), free once a stable version is out.
+// version.json is written by the release automation, so this follows the newest release by itself.
+function newPlan() {
+  let channel = "beta";
+  try {
+    channel = String(require("../version.json").channel || "beta").toLowerCase();
+  } catch {
+    // no version file: beta
+  }
+  return channel === "stable" ? "free" : channel === "alpha" ? "alpha" : "beta";
+}
 
 const MAKES = ["Gaming", "Podcasts", "Education", "Other"];
 const EMAIL = /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]{2,}$/;
@@ -98,25 +110,26 @@ module.exports = async function handler(req, res) {
     const days = Number(process.env.BETA_DAYS || 180);
     const today = new Date().toISOString().slice(0, 10);
     const now = new Date();
-    let [row] = await db.select("beta_users", `app=eq.fragmio&email=${db.eq(email)}&select=*`);
+    let [row] = await db.select("users", `app=eq.fragmio&email=${db.eq(email)}&select=*`);
     let isNew = false;
 
     if (!row) {
       const name = email.split("@")[0];
       const { code, expires } = invite.makeCode(email, name, days);
-      row = await db.insert("beta_users", { app: "fragmio", email, makes, code, expires });
+      row = await db.insert("users", { app: "fragmio", email, plan: newPlan(), makes, code, expires });
       isNew = true;
     } else {
       if (row.last_sent_at && now - new Date(row.last_sent_at) < RESEND_GAP) return res.status(200).json({ ok: true });
       const patch = {};
       if (makes && makes !== row.makes) patch.makes = makes;
-      if (row.expires && row.expires < today) Object.assign(patch, invite.makeCode(email, email.split("@")[0], days)); // old code expired: a fresh one
-      if (Object.keys(patch).length) row = await db.update("beta_users", `id=eq.${row.id}`, patch);
+      // No code yet (e.g. they bought Pro first) or the old one expired: a fresh one.
+      if (!row.code || (row.expires && row.expires < today)) Object.assign(patch, invite.makeCode(email, email.split("@")[0], days));
+      if (Object.keys(patch).length) row = await db.update("users", `id=eq.${row.id}`, patch);
     }
 
     const m = codeEmail(row.code, row.expires);
     await mail.send({ to: email, subject: m.subject, text: m.text, html: m.html, fromName: "Fragmio", replyTo: mail.ownerInbox() || undefined });
-    await db.update("beta_users", `id=eq.${row.id}`, { last_sent_at: now.toISOString(), sent_count: (row.sent_count || 0) + 1 });
+    await db.update("users", `id=eq.${row.id}`, { last_sent_at: now.toISOString(), sent_count: (row.sent_count || 0) + 1 });
 
     if (isNew && process.env.NOTIFY_NEW_BETA === "1" && mail.ownerInbox()) {
       await mail

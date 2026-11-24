@@ -41,12 +41,14 @@ module.exports = async function handler(req, res) {
 
   const kind = KINDS[body.kind] ? body.kind : "";
   const message = String(body.message || "").trim().slice(0, 5000);
+  const name = short(body.name, 80);
   const email = String(body.email || "").trim().toLowerCase().slice(0, 200);
   const version = short(body.version, 30);
   const channel = short(body.channel, 20);
   const os = short(body.os, 60);
   if (!kind) return res.status(400).json({ ok: false, error: "Please choose what kind of message this is." });
   if (message.length < 5) return res.status(400).json({ ok: false, error: "Please write a little more." });
+  if (name.length < 2) return res.status(400).json({ ok: false, error: "Please enter your name." });
   if (!EMAIL.test(email)) return res.status(400).json({ ok: false, error: "Please enter a valid email address." });
 
   const owner = mail.ownerInbox();
@@ -63,7 +65,7 @@ module.exports = async function handler(req, res) {
   let mailed = false;
   if (db.ready()) {
     try {
-      await db.insert("feedback", { app: "fragmio", kind, message, email, version, channel, os });
+      await db.insert("feedback", { app: "fragmio", kind, message, name, email, version, channel, os });
       saved = true;
     } catch (err) {
       console.error("feedback save failed:", err && err.message);
@@ -75,12 +77,12 @@ module.exports = async function handler(req, res) {
     try {
       await mail.send({
         to: owner,
-        replyTo: email,
+        replyTo: `${name.replace(/["<>]/g, "")} <${email}>`,
         fromName: "Fragmio feedback",
         subject: `[Fragmio ${KINDS[kind]}] ${first}${message.length > 60 ? "…" : ""}`,
-        text: [`${KINDS[kind]} from ${email}`, about, "", message, "", "Reply to this email to answer them."].filter((l) => l !== undefined).join("\n"),
+        text: [`${KINDS[kind]} from ${name} <${email}>`, about, "", message, "", "Reply to this email to answer them."].filter((l) => l !== undefined).join("\n"),
         html: `<div style="font-family:Segoe UI,Arial,sans-serif;font-size:15px;line-height:1.55;color:#1c2126;max-width:600px">
-<p style="margin:0 0 4px"><b>${esc(KINDS[kind])}</b> from <a href="mailto:${esc(email)}">${esc(email)}</a></p>
+<p style="margin:0 0 4px"><b>${esc(KINDS[kind])}</b> from ${esc(name)} &lt;<a href="mailto:${esc(email)}">${esc(email)}</a>&gt;</p>
 ${about ? `<p style="margin:0 0 14px;color:#6b7280;font-size:13px">${esc(about)}</p>` : ""}
 <div style="white-space:pre-wrap;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:14px">${esc(message)}</div>
 <p style="color:#6b7280;font-size:13px;margin:14px 0 0">Reply to this email to answer them.${saved ? " It is also saved in Supabase (table feedback)." : ""}</p></div>`,
