@@ -1,12 +1,13 @@
 {
-  "version": "1.19.0",
+  "version": "1.19.1",
   "channel": "beta",
   "date": "2026-11-24",
   "download": "https://fragmio.vercel.app/download",
   "notes": [
-    "Eight new colour themes, each in dark and light (View → Theme)",
-    "New Berry look: app icon, file icon and the default theme",
-    "The logo now matches the colour theme you pick"
+    "Picture in picture layout: your game fills the frame with your facecam in a corner",
+    "AI captions: turn what you say into captions automatically, offline on your PC",
+    "Auto clips: AI finds the best moments in a long video and turns them into clips",
+    "A new, cleaner app layout"
   ],
   "important": false
 }
