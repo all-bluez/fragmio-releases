@@ -28,7 +28,7 @@ export const site = {
   date: pretty(v.date) ?? c.date ?? '',
   installerUrl: installer,
   // Every download button: /get starts the newest installer (newest stable once there is one), from GitHub.
-  downloadHref: '/download',
+  downloadHref: '/get',
   downloadName: 'the newest installer (.exe)',
   latestUrl: c.downloadUrl || 'https://github.com/all-bluez/fragmio-releases/releases/latest',
   releasesUrl: c.releasesUrl || 'https://github.com/all-bluez/fragmio-releases/releases',

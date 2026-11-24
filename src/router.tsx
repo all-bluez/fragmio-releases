@@ -37,7 +37,7 @@ export function Router({ children }: { children: ReactNode }): JSX.Element {
       const a = (e.target as Element | null)?.closest?.('a')
       if (!a || a.target || a.hasAttribute('download')) return
       const url = new URL(a.href, location.href)
-      if (url.origin !== location.origin || url.pathname.startsWith('/api/') || /\.[a-z0-9]+$/i.test(url.pathname)) return
+      if (url.origin !== location.origin || url.pathname === '/get' || url.pathname.startsWith('/api/') || /\.[a-z0-9]+$/i.test(url.pathname)) return
       // Same page, only a section: let the browser scroll.
       if (url.pathname === location.pathname && url.search === location.search && url.hash) return
       e.preventDefault()
