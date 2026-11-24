@@ -3,7 +3,7 @@ import { useRef, type JSX } from 'react'
 import { AccessForm } from '../components/AccessForm'
 import { AllbluezLogo, FragmioMark } from '../components/Logos'
 import { PlanCard } from '../components/Plans'
-import { AutoClipsDemo, BeforeAfter, BeforeAfterPoints, CaptionDemo, HeroWords, TryFrame, TryTemplates, TypePicker, useReveal } from '../home/Demos'
+import { AppShot, AutoClipsDemo, BeforeAfter, BeforeAfterPoints, CaptionDemo, HeroWords, TryFrame, TryTemplates, TypePicker, useReveal } from '../home/Demos'
 import { usePageMeta } from '../router'
 import { site } from '../site'
 
@@ -86,110 +86,7 @@ export function Home(): JSX.Element {
           <span>Up to 4K</span>
         </div>{' '}
         <TypePicker />{' '}
-        <div className="shot">
-          <div className="win">
-            {' '}
-            <div className="tb">
-              <FragmioMark />
-              <div className="m">
-                <span>File</span>
-                <span>Edit</span>
-                <span>Clip</span>
-                <span>View</span>
-                <span>Help</span>
-              </div>
-              <span className="t">podcast_ep12.fragmio</span>
-              <div className="x">
-                <span className="exp">Export (3)</span>
-              </div>
-            </div>{' '}
-            <div className="body">
-              {' '}
-              <div className="stagewrap">
-                {' '}
-                <div className="sbar">
-                  <div className="seg">
-                    <span className="on">Framing</span>
-                    <span>Editing</span>
-                    <span>Preview</span>
-                  </div>
-                  <span className="sel">Layout: Split</span>
-                  <span className="sel">Shape: 9:16</span>
-                </div>{' '}
-                <div className="stage">
-                  <div className="vid">
-                    <div className="p1" />
-                    <div className="p2" />
-                    <div className="box" style={{ left: '12%', width: '34%' }} />
-                    <div className="box" style={{ left: '56%', width: '34%' }} />
-                  </div>
-                </div>{' '}
-              </div>{' '}
-              <div className="side">
-                <div className="tabs">
-                  <span className="on">Clip</span>
-                  <span>Background</span>
-                  <span>Text</span>
-                  <span>Templates</span>
-                  <span>Frames</span>
-                </div>{' '}
-                <div className="ins">
-                  <span className="lab">Speed</span>
-                  <div className="chips">
-                    <span>0.75×</span>
-                    <span className="on">1×</span>
-                    <span>1.25×</span>
-                    <span>1.5×</span>
-                    <span>2×</span>
-                  </div>{' '}
-                  <span className="lab">Template</span>
-                  <div className="thumbs">
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                  </div>{' '}
-                  <span className="lab">All clips</span>
-                  <div className="list">
-                    <div className="it on">
-                      <span className="n">1</span>The big reveal<small>0:42</small>
-                    </div>
-                    <div className="it">
-                      <span className="n">2</span>Best advice<small>0:31</small>
-                    </div>
-                    <div className="it">
-                      <span className="n">3</span>Funny moment<small>0:18</small>
-                    </div>
-                  </div>
-                </div>
-              </div>{' '}
-            </div>{' '}
-            <div className="tl">
-              <div className="ruler" />
-              <div className="track">
-                <i style={{ left: '0' }} />
-                <i style={{ left: '14%' }} />
-                <i style={{ left: '28%' }} />
-                <i style={{ left: '42%' }} />
-                <i style={{ left: '56%' }} />
-                <i style={{ left: '70%' }} />
-                <i style={{ left: '84%' }} />
-                <div className="clip" style={{ left: '6%', width: '15%' }}>
-                  <b>1</b>
-                </div>
-                <div className="clip" style={{ left: '36%', width: '12%' }}>
-                  <b>2</b>
-                </div>
-                <div className="clip" style={{ left: '66%', width: '9%' }}>
-                  <b>3</b>
-                </div>
-                <div className="head" />
-              </div>
-              <div className="wave" />
-            </div>{' '}
-          </div>
-          <p className="cap">Fragmio, Framing view: two speakers in a Split layout, three clips marked on the timeline.</p>
-        </div>{' '}
+        <AppShot />{' '}
       </section>{' '}
       <section className="reveal plat w">
         <h2>Export once, sized for every app</h2>

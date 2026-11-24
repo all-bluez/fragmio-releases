@@ -2079,3 +2079,105 @@ code {
 .by-ab { color: inherit !important; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35em; }
 .by-ab .inline-logo { color: var(--text); }
 .by-ab:hover { text-decoration: underline; }
+
+/* ---- The app picture: working tabs, chips and clips ---- */
+.shot .win button{font:inherit;background:none;border:0;margin:0;color:inherit;cursor:pointer;text-align:inherit}
+.shot .win button:focus-visible{outline:2px solid var(--a);outline-offset:1px}
+.seg button{padding:3px 9px;border-radius:5px;color:var(--uimuted)}
+.seg button:hover{color:var(--uitext)}
+.seg button.on{background:var(--a);color:#fff}
+:root[data-theme="dark"] .seg button.on{color:#0f1418}
+.tabs button{text-align:center!important;padding:8px 0;color:var(--uimuted);font-size:10px}
+.tabs button:hover{color:var(--uitext)}
+.tabs button.on{color:var(--uitext);box-shadow:inset 0 -2px var(--a)}
+.chips button{padding:3px 7px;border:1px solid var(--uiline)!important;border-radius:5px;color:var(--uimuted)}
+.chips button:hover{color:var(--uitext)}
+.chips button.on{border-color:var(--a)!important;color:var(--uitext);background:color-mix(in srgb,var(--a) 14%,transparent)}
+.thumbs button{aspect-ratio:9/16;border-radius:5px;padding:0}
+.thumbs button.on{outline:2px solid var(--a);outline-offset:1px}
+.list button.it{width:100%;display:flex;gap:8px;align-items:center;padding:6px;border-radius:6px}
+.list button.it:hover{background:color-mix(in srgb,var(--ui2) 60%,transparent)}
+.list button.it.on{background:var(--ui2)}
+.swatches{display:flex;gap:6px}
+.swatches button{width:20px;height:20px;border-radius:50%;padding:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.swatches button.on{outline:2px solid var(--a);outline-offset:2px}
+.hint-s{color:var(--uimuted);font-size:10px}
+.words{color:var(--uitext);font-weight:700;font-size:11px}
+.words em{font-style:normal;color:#FFD84D}
+.st-sample{width:22px;height:16px;border-radius:4px;background:#2b3440;display:grid;place-items:center;font-size:9px;font-weight:800;color:#fff}
+.st-sample.st-box{background:#fff;color:#1c2126}
+.st-sample.st-script{font-family:Georgia,serif;font-style:italic;font-weight:600}
+.st-sample.st-clean{font-weight:600}
+.shot .win .track button.clip{padding:0;border:2px solid var(--a);background:color-mix(in srgb,var(--a) 22%,transparent)}
+.shot .win .track button.clip.on{border-color:#fff}
+/* Editing and Preview: the finished 9:16 clip */
+.vid.editing,.vid.previewing{background:#0c0f12}
+.vid .flat{position:absolute;inset:0}
+.vid .flat.grad{background:linear-gradient(160deg,var(--g1),var(--g2))}
+.vid.editing .capx{outline:1px dashed rgba(255,255,255,.85);outline-offset:3px}
+.vid .phn.line{border-color:#fff}
+.vid .phn.glass{border:4px solid rgba(255,255,255,.35);box-shadow:0 0 0 1px rgba(255,255,255,.5),0 10px 30px rgba(0,0,0,.5)}
+.vid .phn.floating{border:0;transform:translateX(-50%) scale(.92);box-shadow:0 18px 40px rgba(0,0,0,.7)}
+.vid:not(.editing):not(.previewing) .phn{border:3px solid #fff}
+.vid .phn:not(.line):not(.glass):not(.floating){border-color:transparent}
+.vid.previewing .pbar{position:absolute;left:50%;transform:translateX(-50%);bottom:5%;width:20%;height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;z-index:3}
+.vid.previewing .pbar i{display:block;height:100%;width:40%;background:var(--a);animation:pbar 6s linear infinite}
+@keyframes pbar{from{width:0}to{width:100%}}
+@media (prefers-reduced-motion:reduce){.vid.previewing .pbar i{animation:none}}
+.capx.st-hook{text-transform:uppercase;text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.5)}
+.capx.st-box{text-shadow:none}
+.capx.st-box{background:#fff;color:#1c2126;border-radius:3px;padding:2px 4px;left:12%;right:12%}
+.capx.st-box em{color:var(--a)}
+.capx.st-clean{font-weight:600;text-transform:none}
+.capx.st-clean em{color:#fff;text-decoration:underline;text-decoration-color:#FFD84D;text-underline-offset:3px}
+.capx.st-script{font-family:Georgia,serif;font-style:italic;font-weight:600;text-transform:none}
+.capx.st-script em{color:#ffd9c7}
+@media (prefers-reduced-motion:reduce){.shot .clip{animation:none}}
+
+/* ---- Phones ---- */
+/* The closing box keeps the page's side margins. */
+.final.w{padding-left:20px;padding-right:20px}
+@media (max-width:640px){
+  /* The comparison table becomes one card per row: the question, then Fragmio, then other tools. */
+  .cmp-wrap{overflow:visible;border:0;background:none}
+  .cmp{min-width:0;font-size:14px}
+  .cmp thead{display:none}
+  .cmp,.cmp tbody,.cmp tr,.cmp th,.cmp td{display:block;width:auto}
+  .cmp tr{border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden;margin-bottom:10px}
+  .cmp tbody th{width:auto;padding:12px 14px 6px;border:0}
+  .cmp td{padding:8px 14px 10px;border:0;border-top:1px solid var(--line)}
+  .cmp td::before{display:block;font-size:11.5px;font-weight:700;margin-bottom:3px;color:var(--muted)}
+  .cmp td.cmp-us::before{content:"Fragmio";color:var(--a)}
+  .cmp td:not(.cmp-us)::before{content:"Other clipping tools"}
+  /* Fingers need bigger targets. */
+  .fcols a{padding:9px 0;margin:0}
+  .again{padding:10px 4px;margin:-10px -4px}
+  .fbox{padding:36px 18px}
+  .fbox h2{font-size:26px}
+  footer .by-ab{padding:10px 0}
+}
+
+/* ---- Feedback form ---- */
+.fb-form{display:grid;gap:18px}
+.fb-form .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.fb-form fieldset{border:0;padding:0;margin:0}
+.fb-form legend,.fb-field>span{display:block;font-weight:600;font-size:14.5px;margin-bottom:8px}
+.fb-kinds{display:flex;flex-wrap:wrap;gap:8px}
+.fb-kinds label{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:99px;cursor:pointer;font-weight:600;font-size:14.5px;color:var(--muted);background:var(--bg)}
+.fb-kinds label:hover{color:var(--text)}
+.fb-kinds label.on{border-color:var(--a);color:var(--text);background:color-mix(in srgb,var(--a) 12%,transparent)}
+.fb-kinds input{position:absolute;opacity:0;width:1px;height:1px}
+.fb-kinds label:focus-within{outline:2px solid var(--a);outline-offset:2px}
+.fb-field{display:block}
+.fb-field textarea,.fb-field input{display:block;width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:inherit;font-size:16px;line-height:1.5}
+.fb-field textarea{resize:vertical;min-height:150px}
+.fb-field textarea:focus,.fb-field input:focus{outline:2px solid var(--a);outline-offset:1px;border-color:transparent}
+.fb-field small{display:block;margin-top:6px;color:var(--muted);font-size:13px}
+.fb-about{margin:0;font-size:13.5px;color:var(--muted)}
+.fb-send{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.fb-send .btn{min-height:46px;padding-left:28px;padding-right:28px}
+.fb-send .access-msg{margin:0}
+.fb-done{text-align:center;padding:18px 0}
+.fb-done h3{font-size:20px;margin-bottom:6px}
+.fb-done .btn{margin-top:14px}
+@media (max-width:640px){.fb-send .btn{width:100%}}

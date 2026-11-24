@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type JSX, type RefObject } from 'react'
 import { KINDS, setKind, useKind, type Kind } from '../makes'
 import { EXAMPLES, SOURCES, pane, stars } from './examples'
+import { FragmioMark } from '../components/Logos'
 
 const reduced = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches
 const Html = ({ html, className, style }: { html: string; className?: string; style?: CSSProperties }): JSX.Element => (
@@ -20,6 +21,264 @@ export function TypePicker(): JSX.Element {
           {KIND_NAMES[k]}
         </button>
       ))}
+    </div>
+  )
+}
+
+// ---- The app picture under "Show examples for": the project, layout, crop boxes and clips follow the chosen kind ----
+type Box = { left: number; width: number; top?: number; height?: number; still?: boolean }
+const SHOTS: Record<Kind, { file: string; layout: string; boxes: Box[]; cap: string }> = {
+  gaming: {
+    file: 'stream_highlights.fragmio',
+    layout: 'Split',
+    // The facecam in its corner, and a tall part of the game.
+    boxes: [
+      { left: 73, width: 24, top: 5, height: 32, still: true },
+      { left: 30, width: 34 }
+    ],
+    cap: 'Fragmio, Framing view: the facecam and the game in a Split layout, three clips marked on the timeline.'
+  },
+  podcast: {
+    file: 'podcast_ep12.fragmio',
+    layout: 'Split',
+    boxes: [
+      { left: 9, width: 34 },
+      { left: 55, width: 34 }
+    ],
+    cap: 'Fragmio, Framing view: two speakers in a Split layout, three clips marked on the timeline.'
+  },
+  teaching: {
+    file: 'lesson_07.fragmio',
+    layout: 'Fill',
+    boxes: [{ left: 54, width: 34 }],
+    cap: 'Fragmio, Framing view: the teacher in a Fill layout, three clips marked on the timeline.'
+  },
+  vlog: {
+    file: 'city_trip.fragmio',
+    layout: 'Fill',
+    boxes: [{ left: 32, width: 34 }],
+    cap: 'Fragmio, Framing view: one person in a Fill layout, three clips marked on the timeline.'
+  }
+}
+/** "12:04 – 12:41 · 37 s" → "0:37" */
+const clipLength = (span: string): string => {
+  const sec = Number(/(\d+)\s*s$/.exec(span)?.[1] ?? 0)
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+}
+
+type View = 'Framing' | 'Editing' | 'Preview'
+type Tab = 'Clip' | 'Background' | 'Text' | 'Templates' | 'Frames'
+const VIEWS: View[] = ['Framing', 'Editing', 'Preview']
+const TABS: Tab[] = ['Clip', 'Background', 'Text', 'Templates', 'Frames']
+const SPEEDS = ['0.75×', '1×', '1.25×', '1.5×', '2×']
+const BACKGROUNDS = ['Blur', 'Colour', 'Gradient', 'Image']
+const FRAME_KINDS = ['None', 'Line', 'Glass', 'Floating']
+const SWATCHES = ['#111417', '#ffffff', 'var(--g1)', 'var(--g2)', '#FFD84D']
+const THUMBS = [
+  'linear-gradient(160deg, var(--g1), var(--g2))',
+  'linear-gradient(160deg, #1c2126 50%, var(--g1) 50%)',
+  'linear-gradient(160deg, var(--asoft), color-mix(in srgb, var(--g2) 55%, #fff))',
+  'linear-gradient(160deg, var(--a), #111417)',
+  'linear-gradient(160deg, #111417 30%, var(--g2) 30% 70%, #111417 70%)',
+  'linear-gradient(200deg, var(--g2), #111417)',
+  'linear-gradient(160deg, #fff 0 12%, var(--g1) 12% 88%, #fff 88%)',
+  'linear-gradient(160deg, #2b3440, #1d242c)'
+]
+
+/** The app picture: its tabs, chips and clip list work like the real app's, in a small way. */
+export function AppShot(): JSX.Element {
+  const kind = useKind()
+  const shot = SHOTS[kind]
+  const t = EXAMPLES[kind]
+  const [view, setView] = useState<View>('Framing')
+  const [tab, setTab] = useState<Tab>('Clip')
+  const [clip, setClip] = useState(0)
+  const [speed, setSpeed] = useState(1)
+  const [template, setTemplate] = useState(0)
+  const [bg, setBg] = useState(0)
+  const [swatch, setSwatch] = useState(0)
+  const [textStyle, setTextStyle] = useState(0)
+  const [frame, setFrame] = useState(0)
+  const caption = t.phones[clip % t.phones.length]
+  const phone = `<div class="phn${FRAME_KINDS[frame] === 'Glass' ? ' glass' : FRAME_KINDS[frame] === 'Line' ? ' line' : FRAME_KINDS[frame] === 'Floating' ? ' floating' : ''}" style="grid-template-rows:${t.split ? '1fr 1fr' : '1fr'}">${t.after(`<div class="capx st-${STYLES[textStyle][0]}">${stars(caption)}</div>`)}</div>`
+  const behind =
+    BACKGROUNDS[bg] === 'Blur' ? `<div class="blur">${t.before()}</div>` : BACKGROUNDS[bg] === 'Colour' ? `<div class="flat" style="background:${SWATCHES[swatch]}"></div>` : BACKGROUNDS[bg] === 'Gradient' ? '<div class="flat grad"></div>' : `<div class="blur">${t.before()}</div>`
+  const pick = (on: boolean): string => (on ? 'on' : '')
+  return (
+    <div className="shot">
+      <div className="win">
+        <div className="tb">
+          <FragmioMark />
+          <div className="m">
+            <span>File</span>
+            <span>Edit</span>
+            <span>Clip</span>
+            <span>View</span>
+            <span>Help</span>
+          </div>
+          <span className="t">{shot.file}</span>
+          <div className="x">
+            <span className="exp">Export (3)</span>
+          </div>
+        </div>
+        <div className="body">
+          <div className="stagewrap">
+            <div className="sbar">
+              <div className="seg" role="tablist" aria-label="View">
+                {VIEWS.map((v) => (
+                  <button key={v} type="button" role="tab" aria-selected={view === v} className={pick(view === v)} onClick={() => setView(v)}>
+                    {v}
+                  </button>
+                ))}
+              </div>
+              <span className="sel">Layout: {shot.layout}</span>
+              <span className="sel">Shape: 9:16</span>
+            </div>
+            <div className="stage">
+              {view === 'Framing' ? (
+                <div className="vid">
+                  <Html className="vid-scene" html={t.before()} />
+                  {shot.boxes.map((b, i) => (
+                    <div
+                      key={`${kind}${i}`}
+                      className="box"
+                      style={{ left: `${b.left}%`, width: `${b.width}%`, ...(b.top !== undefined ? { top: `${b.top}%`, height: `${b.height}%` } : {}), ...(b.still ? { animation: 'none' } : {}) }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Html className={`vid ${view === 'Editing' ? 'editing' : 'previewing'}`} html={(view === 'Editing' ? behind : '') + phone + (view === 'Preview' ? '<div class="pbar"><i></i></div>' : '')} />
+              )}
+            </div>
+          </div>
+          <div className="side">
+            <div className="tabs" role="tablist" aria-label="Settings">
+              {TABS.map((x) => (
+                <button key={x} type="button" role="tab" aria-selected={tab === x} className={pick(tab === x)} onClick={() => setTab(x)}>
+                  {x}
+                </button>
+              ))}
+            </div>
+            <div className="ins">
+              {tab === 'Clip' && (
+                <>
+                  <span className="lab">Speed</span>
+                  <div className="chips">
+                    {SPEEDS.map((x, i) => (
+                      <button key={x} type="button" className={pick(speed === i)} onClick={() => setSpeed(i)}>
+                        {x}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="lab">Template</span>
+                  <div className="thumbs">
+                    {THUMBS.slice(0, 4).map((g, i) => (
+                      <button key={g} type="button" aria-label={`Template ${i + 1}`} className={pick(template === i)} style={{ background: g }} onClick={() => setTemplate(i)} />
+                    ))}
+                  </div>
+                  <span className="lab">All clips</span>
+                  <div className="list">
+                    {t.moments.map(([name, span], i) => (
+                      <button key={name} type="button" className={`it ${pick(clip === i)}`} onClick={() => setClip(i)}>
+                        <span className="n">{i + 1}</span>
+                        {name.replace(/^"|"$/g, '').replace(/…$/, '')}
+                        <small>{clipLength(span)}</small>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {tab === 'Background' && (
+                <>
+                  <span className="lab">Behind the video</span>
+                  <div className="chips">
+                    {BACKGROUNDS.map((x, i) => (
+                      <button key={x} type="button" className={pick(bg === i)} onClick={() => setBg(i)}>
+                        {x}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="lab">Colour</span>
+                  <div className="swatches">
+                    {SWATCHES.map((c, i) => (
+                      <button
+                        key={c}
+                        type="button"
+                        aria-label={`Colour ${i + 1}`}
+                        className={pick(swatch === i && BACKGROUNDS[bg] === 'Colour')}
+                        style={{ background: c }}
+                        onClick={() => {
+                          setSwatch(i)
+                          setBg(1)
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <span className="hint-s">Shows around the video in the Editing view.</span>
+                </>
+              )}
+              {tab === 'Text' && (
+                <>
+                  <span className="lab">Caption style</span>
+                  <div className="list">
+                    {STYLES.map(([k, name], i) => (
+                      <button key={k} type="button" className={`it ${pick(textStyle === i)}`} onClick={() => setTextStyle(i)}>
+                        <span className={`st-sample st-${k}`}>Aa</span>
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="lab">Words</span>
+                  <span className="words" dangerouslySetInnerHTML={{ __html: stars(caption) }} />
+                </>
+              )}
+              {tab === 'Templates' && (
+                <>
+                  <span className="lab">30 templates for single, split and trio clips</span>
+                  <div className="thumbs">
+                    {THUMBS.map((g, i) => (
+                      <button key={g} type="button" aria-label={`Template ${i + 1}`} className={pick(template === i)} style={{ background: g }} onClick={() => setTemplate(i)} />
+                    ))}
+                  </div>
+                </>
+              )}
+              {tab === 'Frames' && (
+                <>
+                  <span className="lab">Frame around the video</span>
+                  <div className="chips">
+                    {FRAME_KINDS.map((x, i) => (
+                      <button key={x} type="button" className={pick(frame === i)} onClick={() => setFrame(i)}>
+                        {x}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="hint-s">See it in the Editing or Preview view.</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="tl">
+          <div className="ruler" />
+          <div className="track">
+            {[0, 14, 28, 42, 56, 70, 84].map((l) => (
+              <i key={l} style={{ left: `${l}%` }} />
+            ))}
+            {[
+              ['6%', '15%'],
+              ['36%', '12%'],
+              ['66%', '9%']
+            ].map(([left, width], i) => (
+              <button key={left} type="button" aria-label={`Clip ${i + 1}`} className={`clip ${pick(clip === i)}`} style={{ left, width }} onClick={() => setClip(i)}>
+                <b>{i + 1}</b>
+              </button>
+            ))}
+            <div className="head" />
+          </div>
+          <div className="wave" />
+        </div>
+      </div>
+      <p className="cap">{view === 'Framing' ? shot.cap : view === 'Editing' ? 'Fragmio, Editing view: the 9:16 clip with its caption, ready for text, frames and background.' : 'Fragmio, Preview view: the clip exactly as it will export.'}</p>
     </div>
   )
 }
