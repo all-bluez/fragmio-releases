@@ -15,14 +15,16 @@ const PALETTES: [string, string, string][] = [
   ['forest', 'Forest', 'linear-gradient(135deg,#2B8A3E,#1098AD)']
 ]
 
-const NAV: [string, string][] = [
-  ['/#features', 'Features'],
-  ['/#templates', 'Templates'],
-  ['/#pricing', 'Pricing'],
-  ['/#faq', 'FAQ'],
-  ['/download', 'Download'],
-  ['/feedback', 'Feedback']
-]
+const NAV: [string, string][] = (
+  [
+    ['/#features', 'Features'],
+    ['/#templates', 'Templates'],
+    ['/#pricing', 'Pricing'],
+    ['/#faq', 'FAQ'],
+    ['/download', 'Download'],
+    ['/feedback', 'Feedback']
+  ] as [string, string][]
+).filter(([href]) => site.showPricing || href !== '/#pricing')
 
 function MoonSun(): JSX.Element {
   return (
