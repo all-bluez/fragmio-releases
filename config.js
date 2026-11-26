@@ -8,9 +8,9 @@ window.FRAGMIO = {
     "https://github.com/all-bluez/fragmio-releases/releases/latest",
   releasesUrl:
     "https://github.com/all-bluez/fragmio-releases/releases",
-  // Support page: put your Razorpay payment page link and UPI ID here, and replace support-qr.png.
-  razorpayUrl: "", // e.g. 'https://rzp.io/l/your-page'  (empty = button hidden)
-  upiId: "", // e.g. 'yourname@okaxis'          (empty = hidden)
+  // The allbluez. hub: pages (Privacy, Terms…), switches and prices come from Admin → Apps → Fragmio,
+  // and payments (Buy Pro, Support) happen on its Pay page in Fragmio's colours.
+  hubUrl: "https://allbluez-hub.vercel.app",
   // Feedback: a Google Form link (Send → link icon). Empty = the page shows "coming soon".
   feedbackFormUrl: "",
   youtubeChannel: "https://www.youtube.com/@all_blue_z",

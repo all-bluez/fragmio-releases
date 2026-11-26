@@ -61,7 +61,7 @@ export function AllbluezLogo(): JSX.Element {
           />
           <path transform="translate(3919 0)" d="M39 0V158L417 436L581 411H41V573H668V415L290 137L151 162H670V0Z" />
         </g>
-        <circle cx="4784" cy="135" r="135" className="ab-dot" fill="#2f5bff" />
+        <circle cx="4784" cy="135" r="135" className="ab-dot" fill="#d6336c" />
       </g>
     </svg>
   )

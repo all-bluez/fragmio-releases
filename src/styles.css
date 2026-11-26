@@ -2184,3 +2184,38 @@ code {
 .fb-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .fb-note{display:block;margin-top:-10px;color:var(--muted);font-size:13px}
 @media (max-width:640px){.fb-two{grid-template-columns:1fr}}
+
+/* Pages from the hub (Privacy, Terms…) and the changelog */
+.doc { max-width: 1060px; }
+.doc-head { padding-bottom: 22px; margin-bottom: 30px; border-bottom: 1px solid var(--line); }
+.doc-head h1 { margin-bottom: 6px; }
+.doc-head h1::after { content: ""; display: block; width: 56px; height: 4px; border-radius: 4px; margin-top: 14px; background: linear-gradient(90deg, var(--g1), var(--g2)); }
+.doc-head p { margin: 10px 0 0; font-size: 14px; }
+.doc-body { max-width: 72ch; font-size: 15.5px; line-height: 1.7; }
+.doc-body h2 { font-size: 21px; line-height: 1.3; margin: 34px 0 10px; }
+.doc-body h2:first-child { margin-top: 0; }
+.doc-body h3 { font-size: 16.5px; margin: 24px 0 8px; }
+.doc-body p { margin: 0 0 14px; }
+.doc-body ul { margin: 0 0 16px; padding-left: 20px; }
+.doc-body li { margin: 4px 0; }
+.doc-body li::marker { color: var(--a); }
+.doc-body a { color: var(--a); text-decoration: underline; text-underline-offset: 2px; }
+.doc-body code { font-size: .9em; padding: 1px 6px; border-radius: 5px; background: var(--bg2); border: 1px solid var(--line); }
+.doc-more { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--line); }
+.doc-more a { font-size: 14px; padding: 7px 14px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); }
+.doc-more a:hover { border-color: var(--a); color: var(--a); }
+.rel-list { list-style: none; margin: 0; padding: 0; }
+.rel-list > li { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 28px; padding: 28px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 90px; }
+.rel-list > li:first-child { padding-top: 0; }
+.rel-side { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; position: sticky; top: 90px; align-self: start; }
+.rel-v { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+.rel-v:hover { color: var(--a); }
+.rel-side time { font-size: 13px; color: var(--muted); }
+.rel-notes h2 { font-size: 18px; margin-top: 0; }
+@media (max-width: 720px) {
+  .rel-list > li { grid-template-columns: 1fr; gap: 10px; }
+  .rel-side { position: static; flex-direction: row; align-items: center; gap: 10px; }
+}
+.support-pay .amounts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.support-pay .amounts .btn { padding: 8px 16px; }
+.support-pay .small { font-size: 13px; }

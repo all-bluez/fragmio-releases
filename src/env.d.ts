@@ -18,8 +18,6 @@ declare global {
       downloadUrl?: string
       releasesUrl?: string
       hubUrl?: string
-      razorpayUrl?: string
-      upiId?: string
       feedbackFormUrl?: string
       youtubeChannel?: string
       tutorials?: { id: string; title?: string; length?: string }[]

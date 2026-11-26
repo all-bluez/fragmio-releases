@@ -3,13 +3,16 @@ import { createRoot } from 'react-dom/client'
 import { Layout } from './components/Layout'
 import { Download } from './pages/Download'
 import { Feedback } from './pages/Feedback'
+import { Changelog } from './pages/Changelog'
+import { Doc } from './pages/Doc'
 import { Home } from './pages/Home'
 import { Support } from './pages/Support'
 import { Router, usePlace } from './router'
+import { useHubApp } from './hub'
 import { countView } from './site'
 import './styles.css'
 
-const PAGES: Record<string, () => JSX.Element> = { '/': Home, '/download': Download, '/feedback': Feedback, '/support': Support }
+const PAGES: Record<string, () => JSX.Element> = { '/': Home, '/download': Download, '/feedback': Feedback, '/support': Support, '/changelog': Changelog }
 
 function NotFound(): JSX.Element {
   return (
@@ -24,13 +27,11 @@ function NotFound(): JSX.Element {
 
 function App(): JSX.Element {
   const { path } = usePlace()
+  // Re-draws everything once the hub answers (pages, switches: pricing, invite-only, support, downloads).
+  useHubApp()
   useEffect(() => countView(path), [path])
-  const Page = PAGES[path] ?? NotFound
-  return (
-    <Layout>
-      <Page />
-    </Layout>
-  )
+  const Page = PAGES[path]
+  return <Layout>{Page ? <Page /> : <Doc notFound={NotFound} />}</Layout>
 }
 
 createRoot(document.getElementById('root')!).render(

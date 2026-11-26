@@ -1,5 +1,6 @@
 // The header, footer and colour picker around every page.
 import { useEffect, useState, type JSX, type ReactNode } from 'react'
+import { hubData } from '../hub'
 import { site, store } from '../site'
 import { usePlace } from '../router'
 import { AllbluezLogo, FragmioMark } from './Logos'
@@ -15,16 +16,17 @@ const PALETTES: [string, string, string][] = [
   ['forest', 'Forest', 'linear-gradient(135deg,#2B8A3E,#1098AD)']
 ]
 
-const NAV: [string, string][] = (
-  [
-    ['/#features', 'Features'],
-    ['/#templates', 'Templates'],
-    ['/#pricing', 'Pricing'],
-    ['/#faq', 'FAQ'],
-    ['/download', 'Download'],
-    ['/feedback', 'Feedback']
-  ] as [string, string][]
-).filter(([href]) => site.showPricing || href !== '/#pricing')
+const nav = (): [string, string][] =>
+  (
+    [
+      ['/#features', 'Features'],
+      ['/#templates', 'Templates'],
+      ['/#pricing', 'Pricing'],
+      ['/#faq', 'FAQ'],
+      ['/download', 'Download'],
+      ['/feedback', 'Feedback']
+    ] as [string, string][]
+  ).filter(([href]) => (site.showPricing || href !== '/#pricing') && (site.downloads || href !== '/download'))
 
 function MoonSun(): JSX.Element {
   return (
@@ -75,16 +77,18 @@ export function Layout({ children }: { children: ReactNode }): JSX.Element {
 
   const links = (
     <>
-      {NAV.map(([href, label]) => (
+      {nav().map(([href, label]) => (
         <a key={href} href={href} aria-current={place.path === href ? 'page' : undefined}>
           {label}
         </a>
       ))}
-      <a href={site.releasesUrl} target="_blank" rel="noopener">
+      <a href="/changelog" aria-current={place.path === '/changelog' ? 'page' : undefined}>
         Changelog
       </a>
     </>
   )
+  // Pages made in Admin → Apps → Fragmio that you ticked "in the footer" (Privacy, Terms…).
+  const footerPages = (hubData()?.pages ?? []).filter((p) => p.footer)
 
   return (
     <>
@@ -99,7 +103,7 @@ export function Layout({ children }: { children: ReactNode }): JSX.Element {
             <button className="icon-btn" type="button" aria-label="Switch light or dark" onClick={toggleMode}>
               <MoonSun />
             </button>
-            {site.stable ? (
+            {!site.invite && site.downloads ? (
               <a href="/download" className="btn">
                 Download
               </a>
@@ -147,11 +151,9 @@ export function Layout({ children }: { children: ReactNode }): JSX.Element {
             <div>
               <h4>Product</h4>
               <a href="/download">Download</a>
+              <a href="/changelog">Changelog</a>
               <a href={site.releasesUrl} target="_blank" rel="noopener">
                 All releases
-              </a>
-              <a href={site.releasesUrl} target="_blank" rel="noopener">
-                Changelog
               </a>
               <a href="/#features">Features</a>
             </div>
@@ -160,15 +162,24 @@ export function Layout({ children }: { children: ReactNode }): JSX.Element {
               <a href="/feedback">Send feedback</a>
               <a href="/feedback?type=problem">Report a problem</a>
               <a href="/#faq">FAQ</a>
-              <a href="/#privacy">Privacy</a>
+              {footerPages.length ? (
+                footerPages.map((p) => (
+                  <a key={p.path} href={'/' + p.path}>
+                    {p.title.replace(/\s+(policy|of use)$/i, '')}
+                  </a>
+                ))
+              ) : (
+                <a href="/#privacy">Privacy</a>
+              )}
             </div>
             <div>
               <h4>ZAK</h4>
-              <a href="/support">Support the maker</a>
+              {site.showSupport && <a href="/support">Support the maker</a>}
+              <a href={site.hubUrl}>More apps by allbluez.</a>
               <a href="https://github.com/zeeshan-ahmad-khan" target="_blank" rel="noopener">
                 GitHub
               </a>
-              <a href="https://zeeshan-ahmad-khan.netlify.app/" target="_blank" rel="noopener">
+              <a href={site.portfolioUrl} target="_blank" rel="noopener">
                 Resume
               </a>
             </div>
@@ -184,7 +195,7 @@ export function Layout({ children }: { children: ReactNode }): JSX.Element {
               </a>
             </span>
             <span>
-              Made with <span className="heart">♥</span> by <a href="/support">ZAK</a>
+              Made with <span className="heart">♥</span> by <a href={site.showSupport ? '/support' : site.portfolioUrl}>ZAK</a>
             </span>
           </div>
         </div>

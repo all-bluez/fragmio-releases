@@ -55,7 +55,7 @@ export function Home(): JSX.Element {
         <p className="sub">
           Mark the moments in your stream, podcast or talk. Frame them for the phone, add titles and captions, and export every clip at once, right on your PC.
         </p>{' '}
-        {!site.stable && (
+        {site.invite && (
           <div id="get" className="haccess">
             <p>Fragmio is in private beta. Leave your email and we'll send you an invite code.</p>
             <AccessForm buttonClass="btn" />
@@ -65,7 +65,7 @@ export function Home(): JSX.Element {
           </div>
         )}{' '}
         <div className="cta">
-          {site.stable && (
+          {!site.invite && site.downloads && (
             <a href="/download" className="btn">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z" />
@@ -977,7 +977,7 @@ export function Home(): JSX.Element {
           <p>
             Fragmio <span>{site.version}</span> is free{!site.stable && <span> during the beta</span>}.
           </p>
-          {site.stable && (
+          {!site.invite && site.downloads && (
             <a href="/download" className="btn">
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z" />
@@ -985,7 +985,7 @@ export function Home(): JSX.Element {
               Download for Windows
             </a>
           )}
-          {!site.stable && (
+          {site.invite && (
             <div className="faccess">
               <p>Fragmio is invite-only during the beta. Leave your email for a code.</p>
               <AccessForm buttonClass="btn light" />
@@ -996,8 +996,8 @@ export function Home(): JSX.Element {
           )}
           <small>
             Windows 10 and 11 · 64-bit ·{' '}
-            <a style={{ textDecoration: 'underline' }} href={site.releasesUrl} target="_blank" rel="noopener">
-              All releases on GitHub
+            <a style={{ textDecoration: 'underline' }} href="/changelog">
+              What&apos;s new
             </a>
           </small>
         </div>
