@@ -1,8 +1,23 @@
 // The Fragmio mark (its colours follow the chosen palette) and the allbluez. wordmark.
-import { useId, type JSX } from 'react'
+import { useEffect, useId, useState, type JSX } from 'react'
+import { hubData, useHubApp } from '../hub'
+import { keptMark, loadMark, uniqueIds } from './UploadedMark'
 
+/** Your uploaded SVG logo (Admin → Apps → Fragmio → Logos and icons), recoloured to the palette; else the built-in one. */
 export function FragmioMark(): JSX.Element {
-  const id = useId().replace(/:/g, '')
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '')
+  useHubApp()
+  const url = hubData()?.assets?.mark ?? ''
+  const [svg, setSvg] = useState(() => (url ? keptMark(url) : ''))
+  useEffect(() => {
+    let on = true
+    if (!url) setSvg('')
+    else void loadMark(url).then((s) => on && setSvg(s))
+    return () => {
+      on = false
+    }
+  }, [url])
+  if (svg) return <span className="lg up" dangerouslySetInnerHTML={{ __html: uniqueIds(svg, `u${id}`) }} />
   return (
     <svg className="lg" width="30" height="30" viewBox="10 22 84 56" aria-hidden="true">
       <defs>
@@ -61,7 +76,7 @@ export function AllbluezLogo(): JSX.Element {
           />
           <path transform="translate(3919 0)" d="M39 0V158L417 436L581 411H41V573H668V415L290 137L151 162H670V0Z" />
         </g>
-        <circle cx="4784" cy="135" r="135" className="ab-dot" fill="#d6336c" />
+        <circle cx="4784" cy="135" r="135" className="ab-dot" fill="#2f5bff" />
       </g>
     </svg>
   )

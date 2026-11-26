@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 export type HubPage = { path: string; title: string; description?: string; updated?: string; footer?: boolean; body: string }
 export type HubProduct = { slug: string; name: string; price_paise: number; months: number | null; badge?: string; active?: boolean }
 export type HubApp = {
+  // Logos and icons uploaded in Admin → Apps → Fragmio (addresses of the files).
+  assets?: { mark?: string; logo?: string }
   pages: HubPage[]
   switches: { pricing?: boolean; invite?: boolean; support?: boolean; downloads?: boolean }
   products: HubProduct[]
@@ -33,9 +35,16 @@ let loading: Promise<void> | null = null
 function load(): Promise<void> {
   loading ??= fetch(`${HUB}/api/app?slug=fragmio`)
     .then((r) => r.json())
-    .then((d: { ok?: boolean } & HubApp) => {
+    .then((d: { ok?: boolean; app?: { assets?: HubApp['assets'] } } & HubApp) => {
       if (!d.ok) return
-      data = { pages: d.pages ?? [], switches: d.switches ?? {}, products: d.products ?? [], owner: d.owner ?? {}, hub: d.hub ?? {} }
+      data = {
+        assets: d.app?.assets ?? {},
+        pages: d.pages ?? [],
+        switches: d.switches ?? {},
+        products: d.products ?? [],
+        owner: d.owner ?? {},
+        hub: d.hub ?? {}
+      }
       try {
         localStorage.setItem(KEY, JSON.stringify(data))
       } catch {
